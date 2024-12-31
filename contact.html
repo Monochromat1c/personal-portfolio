@@ -258,6 +258,16 @@
         </section>
     </main>
 
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-dark-purple/50 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-lg">
+            <div class="flex flex-col items-center">
+                <div class="w-16 h-16 border-4 border-accent-red border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p class="text-navy-blue font-medium">Sending message...</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Success Modal -->
     <div id="success-modal" class="fixed inset-0 bg-dark-purple/50 backdrop-blur-sm hidden items-center justify-center z-50">
         <div class="bg-white p-8 rounded-lg shadow-lg max-w-md mx-4 transform transition-all duration-300 scale-90 opacity-0" id="modal-content">
@@ -301,9 +311,20 @@
             });
         });
 
-        // Modal functionality
+        // Modal and Loading functionality
         const modal = document.getElementById('success-modal');
         const modalContent = document.getElementById('modal-content');
+        const loadingOverlay = document.getElementById('loading-overlay');
+
+        function showLoading() {
+            loadingOverlay.classList.remove('hidden');
+            loadingOverlay.classList.add('flex');
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.remove('flex');
+            loadingOverlay.classList.add('hidden');
+        }
 
         function showModal() {
             modal.classList.remove('hidden');
@@ -333,8 +354,14 @@
 
         // Form submission handling
         const form = document.getElementById('contact-form');
+        const submitButton = form.querySelector('button[type="submit"]');
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Disable submit button and show loading
+            submitButton.disabled = true;
+            showLoading();
             
             try {
                 const formData = new FormData(form);
@@ -344,6 +371,7 @@
                 });
 
                 if (response.ok) {
+                    hideLoading();
                     showModal();
                     form.reset();
                 } else {
@@ -352,6 +380,10 @@
             } catch (error) {
                 console.error('Error:', error);
                 alert('Sorry, there was an error sending your message. Please try again.');
+            } finally {
+                // Re-enable submit button and hide loading
+                submitButton.disabled = false;
+                hideLoading();
             }
         });
 
